@@ -31,9 +31,9 @@ over time.
   (breakfast/lunch/dinner/snack), and get an auto-generated, checkable
   shopping list built from whatever recipes are in the plan. Reachable from
   Home ("This week's meals") and the log sheet's collection grid.
-- **Browse meal ideas** — pick a meal type and a calorie range to see which
-  of your recipes fit (e.g. "breakfast, 300-450 kcal"), then tap one to see
-  its ingredients and prep steps.
+- **Browse meal ideas** — pick sweet vs. savory first, then a meal type and
+  a calorie range, to see which of your recipes fit (e.g. "sweet breakfast,
+  300-450 kcal"), then tap one to see its ingredients and prep steps.
 - **Installable** — has a web app manifest and icons, so it can be added to
   your phone's home screen and used like a native app.
 

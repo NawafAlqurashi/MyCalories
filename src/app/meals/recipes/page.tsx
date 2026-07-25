@@ -44,7 +44,10 @@ export default function RecipesPage() {
             className="card-shadow flex items-center justify-between gap-3 rounded-2xl bg-surface px-4 py-3.5"
           >
             <Link href={`/meals/recipes/${recipe.id}`} className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold">{recipe.name}</p>
+              <p className="truncate text-sm font-semibold">
+                {recipe.taste === "sweet" ? "🍯 " : recipe.taste === "savory" ? "🧂 " : ""}
+                {recipe.name}
+              </p>
               <p className="text-xs text-foreground/40">
                 {recipe.meal_type ? `${MEAL_TYPE_LABELS[recipe.meal_type]} · ` : ""}
                 {recipe.ingredients.split("\n").filter(Boolean).length} ingredients

@@ -113,6 +113,7 @@ function initSchema(db: DatabaseSync) {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       meal_type TEXT,
+      taste TEXT,
       ingredients TEXT NOT NULL DEFAULT '',
       instructions TEXT NOT NULL DEFAULT '',
       calories REAL,
@@ -138,6 +139,9 @@ function initSchema(db: DatabaseSync) {
   const recipeCols = db.prepare(`PRAGMA table_info(recipes)`).all() as unknown as { name: string }[];
   if (!recipeCols.some((c) => c.name === "meal_type")) {
     db.exec(`ALTER TABLE recipes ADD COLUMN meal_type TEXT;`);
+  }
+  if (!recipeCols.some((c) => c.name === "taste")) {
+    db.exec(`ALTER TABLE recipes ADD COLUMN taste TEXT;`);
   }
 
   const insertDay = db.prepare(

@@ -42,10 +42,13 @@ export interface DayPlan {
   category: PlanCategory;
 }
 
+export type Taste = "sweet" | "savory";
+
 export interface Recipe {
   id: number;
   name: string;
   meal_type: MealType | null;
+  taste: Taste | null;
   ingredients: string;
   instructions: string;
   calories: number | null;
@@ -460,6 +463,7 @@ export function getRecipe(id: number): Recipe | undefined {
 export function createRecipe(input: {
   name: string;
   mealType?: MealType | null;
+  taste?: Taste | null;
   ingredients: string;
   instructions: string;
   calories?: number | null;
@@ -469,12 +473,13 @@ export function createRecipe(input: {
 }): Recipe {
   const result = db
     .prepare(
-      `INSERT INTO recipes (name, meal_type, ingredients, instructions, calories, protein, carbs, fat)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO recipes (name, meal_type, taste, ingredients, instructions, calories, protein, carbs, fat)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       input.name,
       input.mealType ?? null,
+      input.taste ?? null,
       input.ingredients,
       input.instructions,
       input.calories ?? null,
@@ -490,6 +495,7 @@ export function updateRecipe(
   input: {
     name: string;
     mealType?: MealType | null;
+    taste?: Taste | null;
     ingredients: string;
     instructions: string;
     calories?: number | null;
@@ -499,11 +505,12 @@ export function updateRecipe(
   }
 ): void {
   db.prepare(
-    `UPDATE recipes SET name = ?, meal_type = ?, ingredients = ?, instructions = ?, calories = ?, protein = ?, carbs = ?, fat = ?
+    `UPDATE recipes SET name = ?, meal_type = ?, taste = ?, ingredients = ?, instructions = ?, calories = ?, protein = ?, carbs = ?, fat = ?
      WHERE id = ?`
   ).run(
     input.name,
     input.mealType ?? null,
+    input.taste ?? null,
     input.ingredients,
     input.instructions,
     input.calories ?? null,

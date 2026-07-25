@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createRecipe, deleteRecipe, updateRecipe, type MealType } from "@/lib/models";
+import { createRecipe, deleteRecipe, updateRecipe, type MealType, type Taste } from "@/lib/models";
 
 function parseNum(value: FormDataEntryValue | null): number | null {
   const str = String(value ?? "").trim();
@@ -16,6 +16,11 @@ function parseMealType(value: FormDataEntryValue | null): MealType | null {
   return str === "breakfast" || str === "lunch" || str === "dinner" || str === "snack" ? str : null;
 }
 
+function parseTaste(value: FormDataEntryValue | null): Taste | null {
+  const str = String(value ?? "").trim();
+  return str === "sweet" || str === "savory" ? str : null;
+}
+
 export async function saveNewRecipe(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const ingredients = String(formData.get("ingredients") ?? "").trim();
@@ -25,6 +30,7 @@ export async function saveNewRecipe(formData: FormData) {
   createRecipe({
     name,
     mealType: parseMealType(formData.get("mealType")),
+    taste: parseTaste(formData.get("taste")),
     ingredients,
     instructions,
     calories: parseNum(formData.get("calories")),
@@ -48,6 +54,7 @@ export async function saveExistingRecipe(id: number, formData: FormData) {
   updateRecipe(id, {
     name,
     mealType: parseMealType(formData.get("mealType")),
+    taste: parseTaste(formData.get("taste")),
     ingredients,
     instructions,
     calories: parseNum(formData.get("calories")),

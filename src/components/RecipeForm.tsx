@@ -21,23 +21,36 @@ export default function RecipeForm({
         />
       </label>
 
-      <label className="flex flex-col gap-1.5">
-        <span className="text-xs font-medium text-foreground/40">
-          Meal type (so it shows up when browsing ideas for that meal)
-        </span>
-        <select
-          name="mealType"
-          defaultValue={recipe?.meal_type ?? ""}
-          className="rounded-xl border border-border bg-surface px-3.5 py-3 text-sm outline-none"
-        >
-          <option value="">Any meal</option>
-          {MEAL_TYPE_ORDER.map((type) => (
-            <option key={type} value={type}>
-              {MEAL_TYPE_LABELS[type]}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="grid grid-cols-2 gap-3">
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs font-medium text-foreground/40">Meal type</span>
+          <select
+            name="mealType"
+            defaultValue={recipe?.meal_type ?? ""}
+            className="rounded-xl border border-border bg-surface px-3.5 py-3 text-sm outline-none"
+          >
+            <option value="">Any meal</option>
+            {MEAL_TYPE_ORDER.map((type) => (
+              <option key={type} value={type}>
+                {MEAL_TYPE_LABELS[type]}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs font-medium text-foreground/40">Sweet or savory?</span>
+          <select
+            name="taste"
+            defaultValue={recipe?.taste ?? ""}
+            className="rounded-xl border border-border bg-surface px-3.5 py-3 text-sm outline-none"
+          >
+            <option value="">Either</option>
+            <option value="sweet">🍯 Sweet</option>
+            <option value="savory">🧂 Savory</option>
+          </select>
+        </label>
+      </div>
 
       <label className="flex flex-col gap-1.5">
         <span className="text-xs font-medium text-foreground/40">
