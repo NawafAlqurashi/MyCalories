@@ -2,13 +2,18 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createRecipe, deleteRecipe, updateRecipe } from "@/lib/models";
+import { createRecipe, deleteRecipe, updateRecipe, type MealType } from "@/lib/models";
 
 function parseNum(value: FormDataEntryValue | null): number | null {
   const str = String(value ?? "").trim();
   if (!str) return null;
   const num = Number(str);
   return Number.isFinite(num) ? num : null;
+}
+
+function parseMealType(value: FormDataEntryValue | null): MealType | null {
+  const str = String(value ?? "").trim();
+  return str === "breakfast" || str === "lunch" || str === "dinner" || str === "snack" ? str : null;
 }
 
 export async function saveNewRecipe(formData: FormData) {
@@ -19,6 +24,7 @@ export async function saveNewRecipe(formData: FormData) {
 
   createRecipe({
     name,
+    mealType: parseMealType(formData.get("mealType")),
     ingredients,
     instructions,
     calories: parseNum(formData.get("calories")),
@@ -29,6 +35,7 @@ export async function saveNewRecipe(formData: FormData) {
 
   revalidatePath("/meals/recipes");
   revalidatePath("/meals/plan");
+  revalidatePath("/meals/browse");
   redirect("/meals/recipes");
 }
 
@@ -40,6 +47,7 @@ export async function saveExistingRecipe(id: number, formData: FormData) {
 
   updateRecipe(id, {
     name,
+    mealType: parseMealType(formData.get("mealType")),
     ingredients,
     instructions,
     calories: parseNum(formData.get("calories")),
@@ -51,6 +59,7 @@ export async function saveExistingRecipe(id: number, formData: FormData) {
   revalidatePath("/meals/recipes");
   revalidatePath("/meals/plan");
   revalidatePath("/meals/shopping-list");
+  revalidatePath("/meals/browse");
   redirect("/meals/recipes");
 }
 
@@ -59,4 +68,5 @@ export async function removeRecipe(id: number) {
   revalidatePath("/meals/recipes");
   revalidatePath("/meals/plan");
   revalidatePath("/meals/shopping-list");
+  revalidatePath("/meals/browse");
 }

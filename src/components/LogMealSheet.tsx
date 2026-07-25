@@ -11,6 +11,7 @@ import {
   UtensilsCrossed,
   ClipboardList,
   CalendarDays,
+  Compass,
   Pencil,
 } from "lucide-react";
 
@@ -21,9 +22,10 @@ const quickActions = [
 ];
 
 const collection = [
+  { href: "/meals/browse", label: "Browse", sub: "Meal ideas", icon: Compass, bg: "bg-rose-500" },
+  { href: "/meals/plan", label: "Plan", sub: "Weekly meals", icon: CalendarDays, bg: "bg-emerald-600" },
   { href: "/products", label: "Products", sub: "Your collection", icon: ShoppingCart, bg: "bg-blue-600" },
   { href: "/meals/saved", label: "Meals", sub: "Saved meals", icon: UtensilsCrossed, bg: "bg-orange-500" },
-  { href: "/meals/plan", label: "Plan", sub: "Weekly meals", icon: CalendarDays, bg: "bg-emerald-600" },
   { href: "/meals", label: "History", sub: "Past meals", icon: ClipboardList, bg: "bg-violet-600" },
 ];
 

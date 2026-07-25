@@ -112,6 +112,7 @@ function initSchema(db: DatabaseSync) {
     CREATE TABLE IF NOT EXISTS recipes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
+      meal_type TEXT,
       ingredients TEXT NOT NULL DEFAULT '',
       instructions TEXT NOT NULL DEFAULT '',
       calories REAL,
@@ -129,9 +130,14 @@ function initSchema(db: DatabaseSync) {
     );
   `);
 
-  const cols = db.prepare(`PRAGMA table_info(meals)`).all() as unknown as { name: string }[];
-  if (!cols.some((c) => c.name === "meal_type")) {
+  const mealCols = db.prepare(`PRAGMA table_info(meals)`).all() as unknown as { name: string }[];
+  if (!mealCols.some((c) => c.name === "meal_type")) {
     db.exec(`ALTER TABLE meals ADD COLUMN meal_type TEXT NOT NULL DEFAULT 'snack';`);
+  }
+
+  const recipeCols = db.prepare(`PRAGMA table_info(recipes)`).all() as unknown as { name: string }[];
+  if (!recipeCols.some((c) => c.name === "meal_type")) {
+    db.exec(`ALTER TABLE recipes ADD COLUMN meal_type TEXT;`);
   }
 
   const insertDay = db.prepare(

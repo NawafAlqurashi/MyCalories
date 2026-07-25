@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChefHat, ShoppingBasket } from "lucide-react";
+import { ChefHat, ShoppingBasket, Compass } from "lucide-react";
 import { getMealPlan, listRecipes } from "@/lib/models";
 import { MEAL_TYPE_LABELS, MEAL_TYPE_ORDER } from "@/lib/mealTypes";
 import { WEEKDAY_LABELS } from "@/lib/planCategories";
@@ -17,24 +17,33 @@ export default function MealPlanPage() {
         <h1 className="text-2xl font-semibold">Weekly meal plan</h1>
       </header>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-2">
+        <Link
+          href="/meals/browse"
+          className="card-shadow flex flex-col items-center gap-1.5 rounded-2xl bg-surface p-3 text-center"
+        >
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-500 text-white">
+            <Compass size={16} />
+          </span>
+          <span className="text-xs font-semibold">Browse ideas</span>
+        </Link>
         <Link
           href="/meals/recipes"
-          className="card-shadow flex items-center gap-2 rounded-2xl bg-surface p-3.5"
+          className="card-shadow flex flex-col items-center gap-1.5 rounded-2xl bg-surface p-3 text-center"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-500 text-white">
             <ChefHat size={16} />
           </span>
-          <span className="text-sm font-semibold">Recipes</span>
+          <span className="text-xs font-semibold">Recipes</span>
         </Link>
         <Link
           href="/meals/shopping-list"
-          className="card-shadow flex items-center gap-2 rounded-2xl bg-surface p-3.5"
+          className="card-shadow flex flex-col items-center gap-1.5 rounded-2xl bg-surface p-3 text-center"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white">
             <ShoppingBasket size={16} />
           </span>
-          <span className="text-sm font-semibold">Shopping list</span>
+          <span className="text-xs font-semibold">Shopping list</span>
         </Link>
       </div>
 
@@ -52,6 +61,11 @@ export default function MealPlanPage() {
             <div className="flex flex-col gap-2">
               {MEAL_TYPE_ORDER.map((mealType) => {
                 const slot = plan.find((s) => s.day_of_week === dayOfWeek && s.meal_type === mealType);
+                // Suggest recipes tagged for this meal (or untagged/"any"), but always keep
+                // whatever is currently assigned selectable even if it's tagged differently.
+                const options = recipes.filter(
+                  (r) => !r.meal_type || r.meal_type === mealType || r.id === slot?.recipe_id
+                );
                 return (
                   <div key={mealType} className="flex items-center gap-2">
                     <span className="w-16 shrink-0 text-xs text-foreground/40">
@@ -63,7 +77,7 @@ export default function MealPlanPage() {
                       className="min-w-0 flex-1 rounded-lg border border-border bg-background px-2.5 py-1.5 text-sm outline-none"
                     >
                       <option value="">—</option>
-                      {recipes.map((recipe) => (
+                      {options.map((recipe) => (
                         <option key={recipe.id} value={recipe.id}>
                           {recipe.name}
                         </option>

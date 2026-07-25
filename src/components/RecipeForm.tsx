@@ -1,4 +1,5 @@
 import type { Recipe } from "@/lib/models";
+import { MEAL_TYPE_LABELS, MEAL_TYPE_ORDER } from "@/lib/mealTypes";
 
 export default function RecipeForm({
   recipe,
@@ -18,6 +19,24 @@ export default function RecipeForm({
           required
           className="rounded-xl border border-border bg-surface px-3.5 py-3 text-sm outline-none placeholder:text-foreground/30"
         />
+      </label>
+
+      <label className="flex flex-col gap-1.5">
+        <span className="text-xs font-medium text-foreground/40">
+          Meal type (so it shows up when browsing ideas for that meal)
+        </span>
+        <select
+          name="mealType"
+          defaultValue={recipe?.meal_type ?? ""}
+          className="rounded-xl border border-border bg-surface px-3.5 py-3 text-sm outline-none"
+        >
+          <option value="">Any meal</option>
+          {MEAL_TYPE_ORDER.map((type) => (
+            <option key={type} value={type}>
+              {MEAL_TYPE_LABELS[type]}
+            </option>
+          ))}
+        </select>
       </label>
 
       <label className="flex flex-col gap-1.5">

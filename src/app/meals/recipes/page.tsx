@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Plus, Trash2, ChefHat } from "lucide-react";
 import { listRecipes } from "@/lib/models";
+import { MEAL_TYPE_LABELS } from "@/lib/mealTypes";
 import { removeRecipe } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +46,7 @@ export default function RecipesPage() {
             <Link href={`/meals/recipes/${recipe.id}`} className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{recipe.name}</p>
               <p className="text-xs text-foreground/40">
+                {recipe.meal_type ? `${MEAL_TYPE_LABELS[recipe.meal_type]} · ` : ""}
                 {recipe.ingredients.split("\n").filter(Boolean).length} ingredients
                 {recipe.calories ? ` · ${Math.round(recipe.calories)} kcal` : ""}
               </p>

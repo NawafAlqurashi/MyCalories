@@ -45,6 +45,7 @@ export interface DayPlan {
 export interface Recipe {
   id: number;
   name: string;
+  meal_type: MealType | null;
   ingredients: string;
   instructions: string;
   calories: number | null;
@@ -446,7 +447,10 @@ export function deleteSavedMeal(id: number): void {
 // ---- Recipes ----
 
 export function listRecipes(): Recipe[] {
-  return db.prepare(`SELECT * FROM recipes ORDER BY name ASC`).all() as unknown as Recipe[];
+  // Spread into plain object literals: node:sqlite rows aren't plain objects,
+  // and Next.js refuses to pass non-plain objects from Server to Client Components.
+  const rows = db.prepare(`SELECT * FROM recipes ORDER BY name ASC`).all() as unknown as Recipe[];
+  return rows.map((r) => ({ ...r }));
 }
 
 export function getRecipe(id: number): Recipe | undefined {
@@ -455,6 +459,7 @@ export function getRecipe(id: number): Recipe | undefined {
 
 export function createRecipe(input: {
   name: string;
+  mealType?: MealType | null;
   ingredients: string;
   instructions: string;
   calories?: number | null;
@@ -464,11 +469,12 @@ export function createRecipe(input: {
 }): Recipe {
   const result = db
     .prepare(
-      `INSERT INTO recipes (name, ingredients, instructions, calories, protein, carbs, fat)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO recipes (name, meal_type, ingredients, instructions, calories, protein, carbs, fat)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       input.name,
+      input.mealType ?? null,
       input.ingredients,
       input.instructions,
       input.calories ?? null,
@@ -483,6 +489,7 @@ export function updateRecipe(
   id: number,
   input: {
     name: string;
+    mealType?: MealType | null;
     ingredients: string;
     instructions: string;
     calories?: number | null;
@@ -492,10 +499,11 @@ export function updateRecipe(
   }
 ): void {
   db.prepare(
-    `UPDATE recipes SET name = ?, ingredients = ?, instructions = ?, calories = ?, protein = ?, carbs = ?, fat = ?
+    `UPDATE recipes SET name = ?, meal_type = ?, ingredients = ?, instructions = ?, calories = ?, protein = ?, carbs = ?, fat = ?
      WHERE id = ?`
   ).run(
     input.name,
+    input.mealType ?? null,
     input.ingredients,
     input.instructions,
     input.calories ?? null,
