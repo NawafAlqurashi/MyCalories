@@ -102,12 +102,23 @@ function initSchema(db: DatabaseSync) {
       fat REAL NOT NULL,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
+
+    CREATE TABLE IF NOT EXISTS weekly_plan (
+      day_of_week INTEGER PRIMARY KEY,
+      label TEXT NOT NULL DEFAULT '',
+      category TEXT NOT NULL DEFAULT 'rest'
+    );
   `);
 
   const cols = db.prepare(`PRAGMA table_info(meals)`).all() as unknown as { name: string }[];
   if (!cols.some((c) => c.name === "meal_type")) {
     db.exec(`ALTER TABLE meals ADD COLUMN meal_type TEXT NOT NULL DEFAULT 'snack';`);
   }
+
+  const insertDay = db.prepare(
+    `INSERT OR IGNORE INTO weekly_plan (day_of_week, label, category) VALUES (?, '', 'rest')`
+  );
+  for (let day = 0; day < 7; day++) insertDay.run(day);
 }
 
 function openDb(): DatabaseSync {

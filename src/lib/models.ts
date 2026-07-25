@@ -34,6 +34,14 @@ export interface WorkoutLog {
   logged_at: string;
 }
 
+export type PlanCategory = "gym" | "sport" | "cardio" | "rest";
+
+export interface DayPlan {
+  day_of_week: number;
+  label: string;
+  category: PlanCategory;
+}
+
 export interface Profile {
   id: number;
   name: string | null;
@@ -237,6 +245,21 @@ export function createWorkoutLog(input: {
 
 export function deleteWorkoutLog(id: number): void {
   db.prepare(`DELETE FROM workout_logs WHERE id = ?`).run(id);
+}
+
+// ---- Weekly plan (recurring schedule: e.g. Wed = Upper, Thu = Padel, Fri = Rest) ----
+
+export function getWeeklyPlan(): DayPlan[] {
+  return db
+    .prepare(`SELECT * FROM weekly_plan ORDER BY day_of_week ASC`)
+    .all() as unknown as DayPlan[];
+}
+
+export function setWeeklyPlan(days: { dayOfWeek: number; label: string; category: PlanCategory }[]): void {
+  const stmt = db.prepare(
+    `UPDATE weekly_plan SET label = ?, category = ? WHERE day_of_week = ?`
+  );
+  for (const d of days) stmt.run(d.label.trim(), d.category, d.dayOfWeek);
 }
 
 // ---- Profile & targets ----

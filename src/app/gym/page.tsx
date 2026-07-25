@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { ChevronRight, Plus } from "lucide-react";
-import { listExercises, listWorkoutLogs } from "@/lib/models";
+import { listExercises, listWorkoutLogs, getWeeklyPlan } from "@/lib/models";
+import WeekPlanStrip from "@/components/WeekPlanStrip";
 
 export const dynamic = "force-dynamic";
 
 export default function GymPage() {
   const exercises = listExercises();
   const allLogs = listWorkoutLogs();
+  const plan = getWeeklyPlan();
 
   const lastLogFor = (exerciseId: number) =>
     [...allLogs]
@@ -25,13 +27,17 @@ export default function GymPage() {
         </Link>
       </header>
 
+      <WeekPlanStrip plan={plan} />
+
+      <h2 className="text-sm font-semibold text-foreground/60">Exercises</h2>
+
       {exercises.length === 0 && (
         <p className="rounded-2xl bg-surface-muted p-4 text-sm text-foreground/40">
           No exercises yet. Add one to start tracking your lifts.
         </p>
       )}
 
-      <div className="flex flex-col gap-2">
+      <div className="-mt-2 flex flex-col gap-2">
         {exercises.map((exercise) => {
           const last = lastLogFor(exercise.id);
           return (
