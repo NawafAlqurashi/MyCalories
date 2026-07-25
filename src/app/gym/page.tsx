@@ -26,7 +26,7 @@ export default function GymPage() {
       </header>
 
       {exercises.length === 0 && (
-        <p className="rounded-xl border border-dashed border-border p-4 text-sm text-foreground/40">
+        <p className="rounded-2xl bg-surface-muted p-4 text-sm text-foreground/40">
           No exercises yet. Add one to start tracking your lifts.
         </p>
       )}
@@ -38,7 +38,7 @@ export default function GymPage() {
             <Link
               key={exercise.id}
               href={`/gym/${exercise.id}`}
-              className="flex items-center justify-between rounded-xl bg-surface border border-border px-4 py-3.5"
+              className="card-shadow flex items-center justify-between rounded-2xl bg-surface px-4 py-3.5"
             >
               <div>
                 <p className="text-sm font-medium">{exercise.name}</p>

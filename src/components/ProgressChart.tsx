@@ -10,14 +10,14 @@ interface Point {
 export default function ProgressChart({ data }: { data: Point[] }) {
   if (data.length < 2) {
     return (
-      <div className="flex h-40 items-center justify-center rounded-xl border border-dashed border-border text-sm text-foreground/40">
+      <div className="flex h-40 items-center justify-center rounded-2xl bg-surface-muted text-sm text-foreground/40">
         Log at least 2 sessions to see a progress chart.
       </div>
     );
   }
 
   return (
-    <div className="h-40 rounded-xl border border-border bg-surface p-2">
+    <div className="card-shadow h-40 rounded-2xl bg-surface p-2">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
           <XAxis

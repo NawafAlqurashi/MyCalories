@@ -13,7 +13,7 @@ export default function SettingsPage() {
       <h1 className="text-2xl font-semibold">Settings</h1>
 
       {targets && (
-        <section className="rounded-2xl border border-border bg-surface p-4">
+        <section className="card-shadow rounded-2xl bg-surface p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-foreground/40">
             Your daily targets
           </p>

@@ -1,17 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f6f8;
-  --foreground: #0f172a;
+  --background: #faf7f2;
+  --foreground: #23190f;
   --surface: #ffffff;
-  --surface-muted: #eef0f4;
-  --border: #e2e5eb;
-  --accent: #16a34a;
-  --accent-soft: #dcfce7;
-  --protein: #f97316;
-  --carbs: #3b82f6;
-  --fat: #eab308;
-  --danger: #dc2626;
+  --surface-muted: #f3ece2;
+  --border: #ece2d4;
+  --accent: #ff6a45;
+  --accent-strong: #f0502b;
+  --accent-soft: #ffe6dc;
+  --ring-from: #ff9a5c;
+  --ring-to: #ff5a67;
+  --protein: #ff6b81;
+  --carbs: #2f9bff;
+  --fat: #ffb648;
+  --danger: #e5484d;
+  --shadow-color: 30 20% 60%;
 }
 
 @theme inline {
@@ -21,6 +25,7 @@
   --color-surface-muted: var(--surface-muted);
   --color-border: var(--border);
   --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
   --color-accent-soft: var(--accent-soft);
   --color-protein: var(--protein);
   --color-carbs: var(--carbs);
@@ -32,13 +37,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0b1120;
-    --foreground: #e2e8f0;
-    --surface: #141b2d;
-    --surface-muted: #1b2438;
-    --border: #232d45;
-    --accent: #22c55e;
-    --accent-soft: #16311f;
+    --background: #171210;
+    --foreground: #f5ece1;
+    --surface: #241c17;
+    --surface-muted: #2c231c;
+    --border: #3a2f26;
+    --accent: #ff7a54;
+    --accent-strong: #ff8f68;
+    --accent-soft: #402a20;
+    --shadow-color: 20 40% 3%;
   }
 }
 
@@ -64,4 +71,42 @@ textarea {
 
 ::-webkit-scrollbar {
   display: none;
+}
+
+.card-shadow {
+  box-shadow:
+    0 1px 2px hsl(var(--shadow-color) / 0.06),
+    0 8px 24px -12px hsl(var(--shadow-color) / 0.18);
+}
+
+.card-shadow-lg {
+  box-shadow:
+    0 2px 8px hsl(var(--shadow-color) / 0.08),
+    0 16px 40px -16px hsl(var(--shadow-color) / 0.28);
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-sheet-up {
+  animation: sheet-up 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
 }

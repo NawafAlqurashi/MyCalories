@@ -29,7 +29,7 @@ export default async function ExercisePage({
 
       <ProgressChart data={chartData} />
 
-      <form action={logSet} className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4">
+      <form action={logSet} className="card-shadow flex flex-col gap-3 rounded-2xl bg-surface p-4">
         <input type="hidden" name="exerciseId" value={exercise.id} />
         <p className="text-sm font-semibold text-foreground/60">Log a set</p>
         <div className="grid grid-cols-3 gap-3">
@@ -47,14 +47,14 @@ export default async function ExercisePage({
           History
         </h2>
         {logs.length === 0 && (
-          <p className="rounded-xl border border-dashed border-border p-4 text-sm text-foreground/40">
+          <p className="rounded-2xl bg-surface-muted p-4 text-sm text-foreground/40">
             No sets logged yet.
           </p>
         )}
         {[...logs].reverse().map((log) => (
           <div
             key={log.id}
-            className="flex items-center justify-between rounded-xl bg-surface border border-border px-4 py-3"
+            className="card-shadow flex items-center justify-between rounded-2xl bg-surface px-4 py-3"
           >
             <div>
               <p className="text-sm font-medium">

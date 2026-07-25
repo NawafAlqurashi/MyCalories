@@ -162,7 +162,7 @@ export default function BarcodeScanner({ initialBarcode }: { initialBarcode?: st
     return (
       <div className="flex flex-col gap-4 px-4 pt-6">
         <h1 className="text-2xl font-semibold">Scan barcode</h1>
-        <div className="rounded-2xl border border-border bg-surface p-4">
+        <div className="card-shadow rounded-2xl bg-surface p-4">
           <p className="text-lg font-semibold">{product.name}</p>
           {product.brand && <p className="text-sm text-foreground/40">{product.brand}</p>}
           <p className="mt-1 text-xs text-foreground/30">Barcode {product.barcode}</p>
@@ -227,7 +227,7 @@ export default function BarcodeScanner({ initialBarcode }: { initialBarcode?: st
       <h1 className="text-2xl font-semibold">Scan barcode</h1>
 
       {scannerSupported && cameraSupported ? (
-        <div className="relative overflow-hidden rounded-2xl border border-border bg-black">
+        <div className="card-shadow relative overflow-hidden rounded-2xl bg-black">
           <video ref={videoRef} muted playsInline className="aspect-square w-full object-cover" />
           {lookingUp && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white">

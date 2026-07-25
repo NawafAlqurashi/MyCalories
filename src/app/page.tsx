@@ -14,6 +14,7 @@ import { todayISO, formatShortDate } from "@/lib/dates";
 import MacroCards from "@/components/MacroCards";
 import WeekStrip from "@/components/WeekStrip";
 import MealSourceIcon from "@/components/MealSourceIcon";
+import QuickAdd from "@/components/QuickAdd";
 
 export const dynamic = "force-dynamic";
 
@@ -87,6 +88,8 @@ export default async function DashboardPage({
 
       <MacroCards totals={totals} targets={targets} />
 
+      <QuickAdd />
+
       <section>
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-foreground/60">
@@ -98,9 +101,14 @@ export default async function DashboardPage({
         </div>
 
         {meals.length === 0 && (
-          <p className="mt-2 rounded-xl border border-dashed border-border p-4 text-sm text-foreground/40">
-            No meals logged {selectedDate === todayISO() ? "yet today" : "on this day"}. Tap the + button to add one.
-          </p>
+          <div className="mt-2 flex flex-col items-center gap-2 rounded-2xl bg-surface-muted p-6 text-center">
+            <span className="text-2xl">🍽️</span>
+            <p className="text-sm text-foreground/50">
+              No meals logged {selectedDate === todayISO() ? "yet today" : "on this day"}.
+              <br />
+              Tap the <span className="font-semibold text-accent">+</span> button below to add one.
+            </p>
+          </div>
         )}
 
         <div className="mt-2 flex flex-col gap-4">
@@ -131,7 +139,7 @@ export default async function DashboardPage({
                   {groupMeals.map((meal) => (
                     <div
                       key={meal.id}
-                      className="flex items-center gap-3 rounded-xl bg-surface border border-border px-3.5 py-3"
+                      className="card-shadow flex items-center gap-3 rounded-2xl bg-surface px-3.5 py-3"
                     >
                       <MealSourceIcon source={meal.source} />
                       <div className="min-w-0 flex-1">

@@ -24,13 +24,15 @@ export default function WeekStrip({
               href={`/?date=${day}`}
               className="flex flex-col items-center gap-1.5"
             >
-              <span className="text-xs text-foreground/40">{formatWeekday(day)}</span>
+              <span className={`text-xs ${isSelected ? "font-semibold text-accent" : "text-foreground/40"}`}>
+                {formatWeekday(day)}
+              </span>
               <span
-                className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold ${
+                className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold transition-transform ${
                   isSelected
-                    ? "bg-accent text-white"
+                    ? "card-shadow scale-105 bg-gradient-to-br from-[var(--ring-from)] to-[var(--ring-to)] text-white"
                     : hasLog
-                      ? "border-2 border-accent/50 text-foreground"
+                      ? "border-2 border-accent/40 text-foreground"
                       : "text-foreground/50"
                 } ${isToday && !isSelected ? "ring-1 ring-accent/40" : ""}`}
               >

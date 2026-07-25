@@ -37,7 +37,7 @@ export default function MealsPage() {
       </header>
 
       {meals.length === 0 && (
-        <p className="rounded-xl border border-dashed border-border p-4 text-sm text-foreground/40">
+        <p className="rounded-2xl bg-surface-muted p-4 text-sm text-foreground/40">
           No meals logged yet. Tap Add to log your first meal.
         </p>
       )}
@@ -50,7 +50,7 @@ export default function MealsPage() {
           {dayMeals.map((meal) => (
             <div
               key={meal.id}
-              className="flex items-center justify-between gap-3 rounded-xl bg-surface border border-border px-4 py-3"
+              className="card-shadow flex items-center justify-between gap-3 rounded-2xl bg-surface px-4 py-3"
             >
               <MealSourceIcon source={meal.source} />
               <div className="min-w-0 flex-1">

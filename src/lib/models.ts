@@ -314,6 +314,10 @@ export function findProductByBarcode(barcode: string): Product | undefined {
     .get(barcode) as unknown as Product | undefined;
 }
 
+export function getProduct(id: number): Product | undefined {
+  return db.prepare(`SELECT * FROM products WHERE id = ?`).get(id) as unknown as Product | undefined;
+}
+
 export function listProducts(): Product[] {
   return db
     .prepare(`SELECT * FROM products ORDER BY created_at DESC`)
