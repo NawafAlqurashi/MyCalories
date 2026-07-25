@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, UtensilsCrossed, Dumbbell } from "lucide-react";
+import { Home, Dumbbell, Settings } from "lucide-react";
 
 const items = [
   { href: "/", label: "Home", icon: Home },
-  { href: "/meals", label: "Meals", icon: UtensilsCrossed },
   { href: "/gym", label: "Gym", icon: Dumbbell },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export default function BottomNav() {

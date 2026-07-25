@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Plus, Trash2 } from "lucide-react";
 import { listMeals } from "@/lib/models";
+import MealSourceIcon from "@/components/MealSourceIcon";
 import { removeMeal } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +27,7 @@ export default function MealsPage() {
   return (
     <div className="flex flex-col gap-5 px-4 pt-6">
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Meals</h1>
+        <h1 className="text-2xl font-semibold">History</h1>
         <Link
           href="/meals/new"
           className="flex items-center gap-1 rounded-full bg-accent px-3.5 py-2 text-sm font-semibold text-white"
@@ -51,7 +52,8 @@ export default function MealsPage() {
               key={meal.id}
               className="flex items-center justify-between gap-3 rounded-xl bg-surface border border-border px-4 py-3"
             >
-              <div className="min-w-0">
+              <MealSourceIcon source={meal.source} />
+              <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{meal.name}</p>
                 <p className="text-xs text-foreground/40">
                   {meal.grams}g · P{Math.round(meal.protein)} · C{Math.round(meal.carbs)} · F{Math.round(meal.fat)}

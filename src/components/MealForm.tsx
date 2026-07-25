@@ -2,9 +2,22 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Camera, Loader2, Pencil } from "lucide-react";
+import { Camera, Loader2, Mic, MessageSquare, Pencil, PencilLine, Square } from "lucide-react";
 
-type Mode = "photo" | "manual";
+type Mode = "photo" | "voice" | "text" | "manual";
+
+// Minimal shape of the (non-standard, not in TS lib.dom) Web Speech API.
+interface SpeechRecognitionLike extends EventTarget {
+  lang: string;
+  interimResults: boolean;
+  maxAlternatives: number;
+  start: () => void;
+  onstart: (() => void) | null;
+  onend: (() => void) | null;
+  onerror: (() => void) | null;
+  onresult: ((event: { results: { [i: number]: { [i: number]: { transcript: string } } } }) => void) | null;
+}
+type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
 
 interface Estimate {
   foodName: string;
@@ -16,11 +29,18 @@ interface Estimate {
   mock: boolean;
 }
 
-export default function MealForm() {
+const MODE_TABS: { key: Mode; label: string; icon: typeof Camera }[] = [
+  { key: "photo", label: "Photo", icon: Camera },
+  { key: "voice", label: "Voice", icon: Mic },
+  { key: "text", label: "Text", icon: MessageSquare },
+  { key: "manual", label: "Manual", icon: PencilLine },
+];
+
+export default function MealForm({ initialMode = "photo" }: { initialMode?: Mode }) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [mode, setMode] = useState<Mode>("photo");
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [description, setDescription] = useState("");
@@ -29,15 +49,48 @@ export default function MealForm() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [estimate, setEstimate] = useState<Estimate | null>(null);
+  const [saveAsTemplate, setSaveAsTemplate] = useState(false);
+  const [listening, setListening] = useState(false);
+
+  function switchMode(m: Mode) {
+    setMode(m);
+    setEstimate(null);
+    setError(null);
+  }
 
   function handleFile(file: File | null) {
     setImageFile(file);
     setEstimate(null);
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
-    } else {
-      setImagePreview(null);
+    setImagePreview(file ? URL.createObjectURL(file) : null);
+  }
+
+  function startListening() {
+    const SpeechRecognitionImpl: SpeechRecognitionCtor | undefined =
+      (window as unknown as { SpeechRecognition?: SpeechRecognitionCtor }).SpeechRecognition ??
+      (window as unknown as { webkitSpeechRecognition?: SpeechRecognitionCtor }).webkitSpeechRecognition;
+
+    if (!SpeechRecognitionImpl) {
+      setError("Voice input isn't supported in this browser — try typing instead.");
+      return;
     }
+
+    const recognition = new SpeechRecognitionImpl();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => setListening(true);
+    recognition.onend = () => setListening(false);
+    recognition.onerror = () => {
+      setListening(false);
+      setError("Couldn't hear that. Try again or type it in.");
+    };
+    recognition.onresult = (event) => {
+      const transcript = event.results[0]?.[0]?.transcript ?? "";
+      setDescription((prev) => (prev ? `${prev} ${transcript}` : transcript));
+    };
+
+    recognition.start();
   }
 
   async function analyze() {
@@ -48,7 +101,9 @@ export default function MealForm() {
       return;
     }
     if (!imageFile && !description.trim()) {
-      setError("Add a photo or describe the meal.");
+      setError(
+        mode === "photo" ? "Add a photo or describe the meal." : "Describe the meal first."
+      );
       return;
     }
 
@@ -57,7 +112,7 @@ export default function MealForm() {
       const formData = new FormData();
       formData.set("grams", String(gramsNum));
       if (description.trim()) formData.set("description", description.trim());
-      if (imageFile) formData.set("image", imageFile);
+      if (mode === "photo" && imageFile) formData.set("image", imageFile);
 
       const res = await fetch("/api/analyze-meal", { method: "POST", body: formData });
       const data = await res.json();
@@ -70,25 +125,34 @@ export default function MealForm() {
     }
   }
 
-  async function saveMeal(source: "photo" | "manual") {
+  async function saveMeal(source: "photo" | "manual" | "voice" | "text") {
     if (!estimate) return;
     setSaving(true);
     setError(null);
     try {
+      const payload = {
+        name: estimate.foodName,
+        grams: estimate.grams,
+        calories: estimate.calories,
+        protein: estimate.protein,
+        carbs: estimate.carbs,
+        fat: estimate.fat,
+      };
       const res = await fetch("/api/meals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: estimate.foodName,
-          grams: estimate.grams,
-          calories: estimate.calories,
-          protein: estimate.protein,
-          carbs: estimate.carbs,
-          fat: estimate.fat,
-          source,
-        }),
+        body: JSON.stringify({ ...payload, source: source === "text" ? "manual" : source }),
       });
       if (!res.ok) throw new Error("Could not save meal");
+
+      if (saveAsTemplate) {
+        await fetch("/api/saved-meals", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+
       router.push("/meals");
       router.refresh();
     } catch (err) {
@@ -107,20 +171,17 @@ export default function MealForm() {
     <div className="flex flex-col gap-5 px-4 pt-6">
       <h1 className="text-2xl font-semibold">Log a meal</h1>
 
-      <div className="flex rounded-xl bg-surface-muted p-1">
-        {(["photo", "manual"] as Mode[]).map((m) => (
+      <div className="grid grid-cols-4 gap-1 rounded-xl bg-surface-muted p-1">
+        {MODE_TABS.map(({ key, label, icon: Icon }) => (
           <button
-            key={m}
-            onClick={() => {
-              setMode(m);
-              setEstimate(null);
-              setError(null);
-            }}
-            className={`flex-1 rounded-lg py-2 text-sm font-semibold capitalize transition-colors ${
-              mode === m ? "bg-surface shadow-sm" : "text-foreground/40"
+            key={key}
+            onClick={() => switchMode(key)}
+            className={`flex flex-col items-center gap-1 rounded-lg py-2 text-xs font-semibold transition-colors ${
+              mode === key ? "bg-surface shadow-sm" : "text-foreground/40"
             }`}
           >
-            {m === "photo" ? "Photo / label" : "Manual"}
+            <Icon size={16} />
+            {label}
           </button>
         ))}
       </div>
@@ -133,11 +194,7 @@ export default function MealForm() {
           >
             {imagePreview ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={imagePreview}
-                alt="Selected meal"
-                className="max-h-48 rounded-xl object-contain"
-              />
+              <img src={imagePreview} alt="Selected meal" className="max-h-48 rounded-xl object-contain" />
             ) : (
               <>
                 <Camera size={28} />
@@ -154,7 +211,6 @@ export default function MealForm() {
             className="hidden"
             onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
           />
-
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -162,48 +218,64 @@ export default function MealForm() {
             rows={2}
             className="rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm placeholder:text-foreground/30"
           />
-
-          <label className="flex items-center justify-between rounded-xl border border-border bg-surface px-3.5 py-2.5">
-            <span className="text-sm font-medium text-foreground/60">Weight</span>
-            <div className="flex items-center gap-1">
-              <input
-                type="number"
-                inputMode="decimal"
-                value={grams}
-                onChange={(e) => setGrams(e.target.value)}
-                className="w-20 bg-transparent text-right text-sm font-semibold outline-none"
-              />
-              <span className="text-sm text-foreground/40">g</span>
-            </div>
-          </label>
-
+          <GramsField grams={grams} setGrams={setGrams} />
           {error && <p className="text-sm text-danger">{error}</p>}
+          <AnalyzeButton onClick={analyze} analyzing={analyzing} />
+        </div>
+      )}
 
+      {!estimate && mode === "voice" && (
+        <div className="flex flex-col gap-4">
           <button
-            onClick={analyze}
-            disabled={analyzing}
-            className="flex items-center justify-center gap-2 rounded-xl bg-accent py-3 text-sm font-semibold text-white disabled:opacity-60"
+            onClick={startListening}
+            className={`flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed py-10 ${
+              listening ? "border-accent text-accent" : "border-border text-foreground/50"
+            }`}
           >
-            {analyzing ? <Loader2 size={16} className="animate-spin" /> : null}
-            {analyzing ? "Analyzing…" : "Analyze"}
+            {listening ? <Square size={28} /> : <Mic size={28} />}
+            <span className="text-sm font-medium">
+              {listening ? "Listening… tap to stop" : "Tap to speak"}
+            </span>
+            <span className="text-xs text-foreground/30">Describe what you ate</span>
           </button>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Your transcribed meal will appear here — edit as needed"
+            rows={3}
+            className="rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm placeholder:text-foreground/30"
+          />
+          <GramsField grams={grams} setGrams={setGrams} />
+          {error && <p className="text-sm text-danger">{error}</p>}
+          <AnalyzeButton onClick={analyze} analyzing={analyzing} />
+        </div>
+      )}
+
+      {!estimate && mode === "text" && (
+        <div className="flex flex-col gap-4">
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Describe your meal, e.g. 2 scrambled eggs with avocado toast"
+            rows={4}
+            autoFocus
+            className="rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm placeholder:text-foreground/30"
+          />
+          <GramsField grams={grams} setGrams={setGrams} />
+          {error && <p className="text-sm text-danger">{error}</p>}
+          <AnalyzeButton onClick={analyze} analyzing={analyzing} />
         </div>
       )}
 
       {!estimate && mode === "manual" && (
-        <ManualEntry
-          grams={grams}
-          setGrams={setGrams}
-          onSubmit={(values) => setEstimate({ ...values, mock: false })}
-        />
+        <ManualEntry grams={grams} setGrams={setGrams} onSubmit={(values) => setEstimate({ ...values, mock: false })} />
       )}
 
       {estimate && (
         <div className="flex flex-col gap-4">
           {estimate.mock && (
             <p className="rounded-xl bg-accent-soft px-3.5 py-2.5 text-xs text-accent">
-              Demo estimate — add an ANTHROPIC_API_KEY to get real photo-based
-              analysis. Values below are editable.
+              Demo estimate — add an ANTHROPIC_API_KEY to get real analysis. Values below are editable.
             </p>
           )}
 
@@ -226,6 +298,16 @@ export default function MealForm() {
             </div>
           </div>
 
+          <label className="flex items-center gap-2 text-sm text-foreground/60">
+            <input
+              type="checkbox"
+              checked={saveAsTemplate}
+              onChange={(e) => setSaveAsTemplate(e.target.checked)}
+              className="h-4 w-4 rounded border-border"
+            />
+            Save as a reusable meal template
+          </label>
+
           {error && <p className="text-sm text-danger">{error}</p>}
 
           <div className="flex gap-3">
@@ -236,7 +318,7 @@ export default function MealForm() {
               Back
             </button>
             <button
-              onClick={() => saveMeal(mode === "photo" ? "photo" : "manual")}
+              onClick={() => saveMeal(mode)}
               disabled={saving}
               className="flex-1 rounded-xl bg-accent py-3 text-sm font-semibold text-white disabled:opacity-60"
             >
@@ -246,6 +328,37 @@ export default function MealForm() {
         </div>
       )}
     </div>
+  );
+}
+
+function AnalyzeButton({ onClick, analyzing }: { onClick: () => void; analyzing: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={analyzing}
+      className="flex items-center justify-center gap-2 rounded-xl bg-accent py-3 text-sm font-semibold text-white disabled:opacity-60"
+    >
+      {analyzing ? <Loader2 size={16} className="animate-spin" /> : null}
+      {analyzing ? "Analyzing…" : "Analyze"}
+    </button>
+  );
+}
+
+function GramsField({ grams, setGrams }: { grams: string; setGrams: (v: string) => void }) {
+  return (
+    <label className="flex items-center justify-between rounded-xl border border-border bg-surface px-3.5 py-2.5">
+      <span className="text-sm font-medium text-foreground/60">Weight</span>
+      <div className="flex items-center gap-1">
+        <input
+          type="number"
+          inputMode="decimal"
+          value={grams}
+          onChange={(e) => setGrams(e.target.value)}
+          className="w-20 bg-transparent text-right text-sm font-semibold outline-none"
+        />
+        <span className="text-sm text-foreground/40">g</span>
+      </div>
+    </label>
   );
 }
 

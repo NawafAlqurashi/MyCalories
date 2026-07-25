@@ -47,6 +47,7 @@ function initSchema(db: DatabaseSync) {
       carbs REAL NOT NULL,
       fat REAL NOT NULL,
       source TEXT NOT NULL DEFAULT 'manual',
+      meal_type TEXT NOT NULL DEFAULT 'snack',
       notes TEXT,
       logged_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
@@ -66,7 +67,47 @@ function initSchema(db: DatabaseSync) {
       notes TEXT,
       logged_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
+
+    CREATE TABLE IF NOT EXISTS profile (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      name TEXT,
+      sex TEXT NOT NULL DEFAULT 'male',
+      weight_kg REAL,
+      height_cm REAL,
+      age INTEGER,
+      activity_level TEXT NOT NULL DEFAULT 'moderate',
+      goal TEXT NOT NULL DEFAULT 'maintain',
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS products (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      barcode TEXT UNIQUE,
+      name TEXT NOT NULL,
+      brand TEXT,
+      calories_per_100g REAL NOT NULL,
+      protein_per_100g REAL NOT NULL,
+      carbs_per_100g REAL NOT NULL,
+      fat_per_100g REAL NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS saved_meals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      grams REAL NOT NULL,
+      calories REAL NOT NULL,
+      protein REAL NOT NULL,
+      carbs REAL NOT NULL,
+      fat REAL NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
   `);
+
+  const cols = db.prepare(`PRAGMA table_info(meals)`).all() as unknown as { name: string }[];
+  if (!cols.some((c) => c.name === "meal_type")) {
+    db.exec(`ALTER TABLE meals ADD COLUMN meal_type TEXT NOT NULL DEFAULT 'snack';`);
+  }
 }
 
 function openDb(): DatabaseSync {

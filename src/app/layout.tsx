@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import BottomNav from "@/components/BottomNav";
+import LogMealSheet from "@/components/LogMealSheet";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -52,6 +53,7 @@ export default function RootLayout({
         <div className="mx-auto flex w-full max-w-md flex-1 flex-col">
           <main className="flex-1 pb-6">{children}</main>
         </div>
+        <LogMealSheet />
         <BottomNav />
       </body>
     </html>
