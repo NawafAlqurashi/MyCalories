@@ -108,6 +108,25 @@ function initSchema(db: DatabaseSync) {
       label TEXT NOT NULL DEFAULT '',
       category TEXT NOT NULL DEFAULT 'rest'
     );
+
+    CREATE TABLE IF NOT EXISTS recipes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      ingredients TEXT NOT NULL DEFAULT '',
+      instructions TEXT NOT NULL DEFAULT '',
+      calories REAL,
+      protein REAL,
+      carbs REAL,
+      fat REAL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS meal_plan_entries (
+      day_of_week INTEGER NOT NULL,
+      meal_type TEXT NOT NULL,
+      recipe_id INTEGER REFERENCES recipes(id) ON DELETE SET NULL,
+      PRIMARY KEY (day_of_week, meal_type)
+    );
   `);
 
   const cols = db.prepare(`PRAGMA table_info(meals)`).all() as unknown as { name: string }[];
@@ -119,6 +138,15 @@ function initSchema(db: DatabaseSync) {
     `INSERT OR IGNORE INTO weekly_plan (day_of_week, label, category) VALUES (?, '', 'rest')`
   );
   for (let day = 0; day < 7; day++) insertDay.run(day);
+
+  const insertPlanSlot = db.prepare(
+    `INSERT OR IGNORE INTO meal_plan_entries (day_of_week, meal_type, recipe_id) VALUES (?, ?, NULL)`
+  );
+  for (let day = 0; day < 7; day++) {
+    for (const mealType of ["breakfast", "lunch", "dinner", "snack"]) {
+      insertPlanSlot.run(day, mealType);
+    }
+  }
 }
 
 function openDb(): DatabaseSync {

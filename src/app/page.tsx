@@ -8,24 +8,18 @@ import {
   getProfile,
   loggedDates,
   currentStreak,
-  type MealType,
 } from "@/lib/models";
 import { todayISO, formatShortDate } from "@/lib/dates";
+import { MEAL_TYPE_LABELS, MEAL_TYPE_ORDER } from "@/lib/mealTypes";
 import MacroCards from "@/components/MacroCards";
 import WeekStrip from "@/components/WeekStrip";
 import MealSourceIcon from "@/components/MealSourceIcon";
 import QuickAdd from "@/components/QuickAdd";
+import WeeklyMealPlanCard from "@/components/WeeklyMealPlanCard";
 
 export const dynamic = "force-dynamic";
 
 const DEFAULT_TARGETS = { calories: 2000, protein: 130, carbs: 220, fat: 65 };
-
-const MEAL_TYPE_LABELS: Record<MealType, string> = {
-  breakfast: "Breakfast",
-  lunch: "Lunch",
-  dinner: "Dinner",
-  snack: "Snack",
-};
 
 function greeting() {
   const hour = new Date().getHours();
@@ -90,6 +84,8 @@ export default async function DashboardPage({
 
       <QuickAdd />
 
+      <WeeklyMealPlanCard />
+
       <section>
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-foreground/60">
@@ -112,8 +108,7 @@ export default async function DashboardPage({
         )}
 
         <div className="mt-2 flex flex-col gap-4">
-          {(["breakfast", "lunch", "dinner", "snack"] as MealType[])
-            .filter((type) => grouped[type].length > 0)
+          {MEAL_TYPE_ORDER.filter((type) => grouped[type].length > 0)
             .map((type) => {
               const groupMeals = grouped[type];
               const groupTotals = totalsFor(groupMeals);

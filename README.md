@@ -23,9 +23,14 @@ over time.
   grouped by breakfast/lunch/dinner/snack.
 - **Gym tracking** — log weight × reps × sets per exercise and see a progress
   chart over time.
-- **Weekly plan** — assign a label to each day of the week (e.g. Wed = Upper
-  Body, Thu = Padel, Fri = Rest) shown as a calendar strip on the Gym tab,
-  editable in one place.
+- **Weekly workout plan** — assign a label to each day of the week (e.g. Wed
+  = Upper Body, Thu = Padel, Fri = Rest) shown as a calendar strip on the Gym
+  tab, editable in one place.
+- **Weekly meal plan** — build recipes (ingredients + prep steps + optional
+  macros), assign one to each day/meal slot (breakfast/lunch/dinner/snack),
+  and get an auto-generated, checkable shopping list built from whatever
+  recipes are in the plan. Reachable from Home ("This week's meals") and the
+  log sheet's collection grid.
 - **Installable** — has a web app manifest and icons, so it can be added to
   your phone's home screen and used like a native app.
 

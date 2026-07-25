@@ -10,6 +10,7 @@ import {
   ShoppingCart,
   UtensilsCrossed,
   ClipboardList,
+  CalendarDays,
   Pencil,
 } from "lucide-react";
 
@@ -22,6 +23,7 @@ const quickActions = [
 const collection = [
   { href: "/products", label: "Products", sub: "Your collection", icon: ShoppingCart, bg: "bg-blue-600" },
   { href: "/meals/saved", label: "Meals", sub: "Saved meals", icon: UtensilsCrossed, bg: "bg-orange-500" },
+  { href: "/meals/plan", label: "Plan", sub: "Weekly meals", icon: CalendarDays, bg: "bg-emerald-600" },
   { href: "/meals", label: "History", sub: "Past meals", icon: ClipboardList, bg: "bg-violet-600" },
 ];
 
@@ -78,7 +80,7 @@ export default function LogMealSheet({ open, onClose }: { open: boolean; onClose
         <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-foreground/40">
           From your collection
         </p>
-        <div className="mt-2 grid grid-cols-3 gap-3">
+        <div className="mt-2 grid grid-cols-2 gap-3">
           {collection.map((a) => (
             <Link
               key={a.href}

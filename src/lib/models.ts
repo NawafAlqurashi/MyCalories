@@ -42,6 +42,30 @@ export interface DayPlan {
   category: PlanCategory;
 }
 
+export interface Recipe {
+  id: number;
+  name: string;
+  ingredients: string;
+  instructions: string;
+  calories: number | null;
+  protein: number | null;
+  carbs: number | null;
+  fat: number | null;
+  created_at: string;
+}
+
+export interface MealPlanSlot {
+  day_of_week: number;
+  meal_type: MealType;
+  recipe_id: number | null;
+  recipe_name: string | null;
+}
+
+export interface ShoppingListItem {
+  text: string;
+  recipeNames: string[];
+}
+
 export interface Profile {
   id: number;
   name: string | null;
@@ -417,4 +441,118 @@ export function getSavedMeal(id: number): SavedMeal | undefined {
 
 export function deleteSavedMeal(id: number): void {
   db.prepare(`DELETE FROM saved_meals WHERE id = ?`).run(id);
+}
+
+// ---- Recipes ----
+
+export function listRecipes(): Recipe[] {
+  return db.prepare(`SELECT * FROM recipes ORDER BY name ASC`).all() as unknown as Recipe[];
+}
+
+export function getRecipe(id: number): Recipe | undefined {
+  return db.prepare(`SELECT * FROM recipes WHERE id = ?`).get(id) as unknown as Recipe | undefined;
+}
+
+export function createRecipe(input: {
+  name: string;
+  ingredients: string;
+  instructions: string;
+  calories?: number | null;
+  protein?: number | null;
+  carbs?: number | null;
+  fat?: number | null;
+}): Recipe {
+  const result = db
+    .prepare(
+      `INSERT INTO recipes (name, ingredients, instructions, calories, protein, carbs, fat)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
+    )
+    .run(
+      input.name,
+      input.ingredients,
+      input.instructions,
+      input.calories ?? null,
+      input.protein ?? null,
+      input.carbs ?? null,
+      input.fat ?? null
+    );
+  return getRecipe(Number(result.lastInsertRowid))!;
+}
+
+export function updateRecipe(
+  id: number,
+  input: {
+    name: string;
+    ingredients: string;
+    instructions: string;
+    calories?: number | null;
+    protein?: number | null;
+    carbs?: number | null;
+    fat?: number | null;
+  }
+): void {
+  db.prepare(
+    `UPDATE recipes SET name = ?, ingredients = ?, instructions = ?, calories = ?, protein = ?, carbs = ?, fat = ?
+     WHERE id = ?`
+  ).run(
+    input.name,
+    input.ingredients,
+    input.instructions,
+    input.calories ?? null,
+    input.protein ?? null,
+    input.carbs ?? null,
+    input.fat ?? null,
+    id
+  );
+}
+
+export function deleteRecipe(id: number): void {
+  db.prepare(`DELETE FROM recipes WHERE id = ?`).run(id);
+}
+
+// ---- Weekly meal plan (recurring: e.g. Wed dinner = Chicken & rice bowl) ----
+
+export function getMealPlan(): MealPlanSlot[] {
+  return db
+    .prepare(
+      `SELECT e.day_of_week, e.meal_type, e.recipe_id, r.name as recipe_name
+       FROM meal_plan_entries e
+       LEFT JOIN recipes r ON r.id = e.recipe_id
+       ORDER BY e.day_of_week ASC,
+         CASE e.meal_type WHEN 'breakfast' THEN 0 WHEN 'lunch' THEN 1 WHEN 'dinner' THEN 2 ELSE 3 END ASC`
+    )
+    .all() as unknown as MealPlanSlot[];
+}
+
+export function setMealPlan(entries: { dayOfWeek: number; mealType: MealType; recipeId: number | null }[]): void {
+  const stmt = db.prepare(
+    `UPDATE meal_plan_entries SET recipe_id = ? WHERE day_of_week = ? AND meal_type = ?`
+  );
+  for (const e of entries) stmt.run(e.recipeId, e.dayOfWeek, e.mealType);
+}
+
+export function getShoppingList(): ShoppingListItem[] {
+  const plan = getMealPlan().filter((slot) => slot.recipe_id !== null);
+  const recipeIds = [...new Set(plan.map((slot) => slot.recipe_id as number))];
+
+  const itemsByKey = new Map<string, ShoppingListItem>();
+  for (const recipeId of recipeIds) {
+    const recipe = getRecipe(recipeId);
+    if (!recipe) continue;
+    const lines = recipe.ingredients
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+    for (const line of lines) {
+      const key = line.toLowerCase();
+      const existing = itemsByKey.get(key);
+      if (existing) {
+        if (!existing.recipeNames.includes(recipe.name)) existing.recipeNames.push(recipe.name);
+      } else {
+        itemsByKey.set(key, { text: line, recipeNames: [recipe.name] });
+      }
+    }
+  }
+
+  return [...itemsByKey.values()].sort((a, b) => a.text.localeCompare(b.text));
 }
