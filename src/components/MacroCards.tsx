@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Ring from "./Ring";
 
 interface Totals {
   calories: number;
@@ -21,6 +20,12 @@ function insight(remaining: number) {
   return `${Math.round(Math.abs(remaining))} kcal over today`;
 }
 
+const MACROS = [
+  { key: "protein", label: "Protein", emoji: "🍗", bg: "bg-protein/15", bar: "bg-protein", text: "text-protein" },
+  { key: "carbs", label: "Carbs", emoji: "🌾", bg: "bg-carbs/15", bar: "bg-carbs", text: "text-carbs" },
+  { key: "fat", label: "Fat", emoji: "🥑", bg: "bg-fat/15", bar: "bg-fat", text: "text-fat" },
+] as const;
+
 export default function MacroCards({
   totals,
   targets,
@@ -30,52 +35,70 @@ export default function MacroCards({
 }) {
   const [mode, setMode] = useState<"consumed" | "remaining">("consumed");
   const remaining = targets.calories - totals.calories;
-
+  const caloriePct = pct(totals.calories, targets.calories);
   const calorieValue =
     mode === "consumed" ? Math.round(totals.calories) : Math.max(0, Math.round(remaining));
-
-  const macros = [
-    { key: "protein", label: "Protein", emoji: "🍗", color: "var(--protein)", textColor: "text-protein" },
-    { key: "carbs", label: "Carbs", emoji: "🌾", color: "var(--carbs)", textColor: "text-carbs" },
-    { key: "fat", label: "Fat", emoji: "🥑", color: "var(--fat)", textColor: "text-fat" },
-  ] as const;
 
   return (
     <section className="flex flex-col gap-3">
       <div className="card-shadow-lg rounded-3xl bg-surface p-5">
-        <div className="flex items-center gap-5">
-          <Ring size={128} strokeWidth={12} progress={pct(totals.calories, targets.calories)} gradient>
-            <div className="flex flex-col items-center">
-              <span className="text-2xl">🔥</span>
-              <span className="text-2xl font-extrabold tabular-nums leading-tight">{calorieValue}</span>
-              <span className="text-[11px] text-foreground/40">
-                {mode === "consumed" ? `of ${Math.round(targets.calories)}` : "kcal left"}
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-foreground/40">
+              <span className="text-sm">🔥</span> Calories
+            </p>
+            <p className="mt-1 text-[2.15rem] font-extrabold leading-none tabular-nums">
+              {calorieValue}
+              <span className="ml-1.5 text-sm font-semibold text-foreground/35">
+                {mode === "consumed" ? `/ ${Math.round(targets.calories)}` : "kcal left"}
               </span>
-            </div>
-          </Ring>
-
-          <div className="flex flex-1 flex-col gap-2.5">
-            <p className="text-sm font-semibold text-foreground/80">{insight(remaining)}</p>
-            <div className="flex gap-3">
-              {macros.map((m) => {
-                const consumed = totals[m.key];
-                const target = targets[m.key];
-                const value = mode === "consumed" ? Math.round(consumed) : Math.max(0, Math.round(target - consumed));
-                return (
-                  <div key={m.key} className="flex flex-col items-center gap-1">
-                    <Ring size={54} strokeWidth={6} progress={pct(consumed, target)} color={m.color}>
-                      <span className="text-base">{m.emoji}</span>
-                    </Ring>
-                    <p className={`text-xs font-bold tabular-nums ${m.textColor}`}>
-                      {value}
-                      <span className="font-medium text-foreground/40">g</span>
-                    </p>
-                    <p className="text-[10px] text-foreground/40">{m.label}</p>
-                  </div>
-                );
-              })}
-            </div>
+            </p>
           </div>
+          <span className="mb-1 shrink-0 rounded-full bg-accent-soft px-2.5 py-1 text-xs font-bold text-accent">
+            {caloriePct}%
+          </span>
+        </div>
+
+        <div className="mt-3.5 h-4 w-full overflow-hidden rounded-full bg-surface-muted">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-[var(--ring-from)] to-[var(--ring-to)] transition-all duration-500"
+            style={{ width: `${caloriePct}%` }}
+          />
+        </div>
+        <p className="mt-2 text-xs font-medium text-foreground/50">{insight(remaining)}</p>
+
+        <div className="mt-5 flex flex-col gap-3.5">
+          {MACROS.map((m) => {
+            const consumed = totals[m.key];
+            const target = targets[m.key];
+            const value =
+              mode === "consumed" ? Math.round(consumed) : Math.max(0, Math.round(target - consumed));
+            const p = pct(consumed, target);
+            return (
+              <div key={m.key} className="flex items-center gap-3">
+                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-sm ${m.bg}`}>
+                  {m.emoji}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-xs font-medium text-foreground/50">{m.label}</span>
+                    <span className={`text-xs font-bold tabular-nums ${m.text}`}>
+                      {value}
+                      <span className="font-medium text-foreground/35">
+                        g{mode === "consumed" ? ` / ${Math.round(target)}g` : ""}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-surface-muted">
+                    <div
+                      className={`h-full rounded-full ${m.bar} transition-all duration-500`}
+                      style={{ width: `${p}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
