@@ -146,10 +146,10 @@ export default async function DashboardPage({
                           })}
                         </p>
                         <div className="mt-1 flex gap-1.5 text-[11px] text-foreground/50">
-                          <span>🔥{Math.round(meal.calories)}</span>
-                          <span>🍗{Math.round(meal.protein)}g</span>
-                          <span>🌾{Math.round(meal.carbs)}g</span>
-                          <span>🥑{Math.round(meal.fat)}g</span>
+                          <span>{Math.round(meal.calories)} kcal</span>
+                          <span className="text-protein">{Math.round(meal.protein)}g P</span>
+                          <span className="text-carbs">{Math.round(meal.carbs)}g C</span>
+                          <span className="text-fat">{Math.round(meal.fat)}g F</span>
                         </div>
                       </div>
                     </div>

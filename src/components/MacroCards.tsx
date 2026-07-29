@@ -21,9 +21,9 @@ function insight(remaining: number) {
 }
 
 const MACROS = [
-  { key: "protein", label: "Protein", emoji: "🍗", bg: "bg-protein/15", bar: "bg-protein", text: "text-protein" },
-  { key: "carbs", label: "Carbs", emoji: "🌾", bg: "bg-carbs/15", bar: "bg-carbs", text: "text-carbs" },
-  { key: "fat", label: "Fat", emoji: "🥑", bg: "bg-fat/15", bar: "bg-fat", text: "text-fat" },
+  { key: "protein", label: "Protein", bar: "bg-protein", text: "text-protein" },
+  { key: "carbs", label: "Carbs", bar: "bg-carbs", text: "text-carbs" },
+  { key: "fat", label: "Fat", bar: "bg-fat", text: "text-fat" },
 ] as const;
 
 export default function MacroCards({
@@ -44,8 +44,8 @@ export default function MacroCards({
       <div className="card-shadow-lg rounded-3xl bg-surface p-5">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-foreground/40">
-              <span className="text-sm">🔥</span> Calories
+            <p className="text-xs font-semibold uppercase tracking-wide text-foreground/40">
+              Calories
             </p>
             <p className="mt-1 text-[2.15rem] font-extrabold leading-none tabular-nums">
               {calorieValue}
@@ -76,9 +76,6 @@ export default function MacroCards({
             const p = pct(consumed, target);
             return (
               <div key={m.key} className="flex items-center gap-3">
-                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-sm ${m.bg}`}>
-                  {m.emoji}
-                </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline justify-between">
                     <span className="text-xs font-medium text-foreground/50">{m.label}</span>

@@ -68,10 +68,10 @@ function hexToRgb(hex) {
 // minimal nutrition/progress logo.
 function renderIcon(size) {
   const rgba = Buffer.alloc(size * size * 4);
-  const bg = hexToRgb("#0f172a"); // slate-900
-  const accent = hexToRgb("#22c55e"); // green-500
-  const accent2 = hexToRgb("#f97316"); // orange-500
-  const white = [245, 247, 250];
+  const bg = hexToRgb("#611b26"); // burgundy
+  const accent = hexToRgb("#e2a24b"); // warm gold
+  const accent2 = hexToRgb("#c66872"); // dusty rose
+  const white = hexToRgb("#f2e9da"); // beige
   const radius = size * 0.22;
 
   const setPixel = (x, y, [r, g, b], a = 255) => {
