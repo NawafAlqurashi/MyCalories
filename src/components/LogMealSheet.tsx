@@ -16,17 +16,17 @@ import {
 } from "lucide-react";
 
 const quickActions = [
-  { href: "/meals/new?mode=photo", label: "Photo", sub: "Snap a meal", icon: Camera, bg: "bg-orange-500" },
-  { href: "/meals/new?mode=voice", label: "Voice", sub: "Describe it", icon: Mic, bg: "bg-pink-600" },
-  { href: "/meals/new?mode=text", label: "Text", sub: "Type it in", icon: MessageSquare, bg: "bg-teal-600" },
+  { href: "/meals/new?mode=photo", label: "Photo", sub: "Snap a meal", icon: Camera },
+  { href: "/meals/new?mode=voice", label: "Voice", sub: "Describe it", icon: Mic },
+  { href: "/meals/new?mode=text", label: "Text", sub: "Type it in", icon: MessageSquare },
 ];
 
 const collection = [
-  { href: "/meals/browse", label: "Browse", sub: "Meal ideas", icon: Compass, bg: "bg-rose-500" },
-  { href: "/meals/plan", label: "Plan", sub: "Weekly meals", icon: CalendarDays, bg: "bg-emerald-600" },
-  { href: "/products", label: "Products", sub: "Your collection", icon: ShoppingCart, bg: "bg-blue-600" },
-  { href: "/meals/saved", label: "Meals", sub: "Saved meals", icon: UtensilsCrossed, bg: "bg-orange-500" },
-  { href: "/meals", label: "History", sub: "Past meals", icon: ClipboardList, bg: "bg-violet-600" },
+  { href: "/meals/browse", label: "Browse", sub: "Meal ideas", icon: Compass },
+  { href: "/meals/plan", label: "Plan", sub: "Weekly meals", icon: CalendarDays },
+  { href: "/products", label: "Products", sub: "Your collection", icon: ShoppingCart },
+  { href: "/meals/saved", label: "Meals", sub: "Saved meals", icon: UtensilsCrossed },
+  { href: "/meals", label: "History", sub: "Past meals", icon: ClipboardList },
 ];
 
 export default function LogMealSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -56,7 +56,7 @@ export default function LogMealSheet({ open, onClose }: { open: boolean; onClose
               onClick={onClose}
               className="card-shadow flex flex-col items-center gap-2 rounded-2xl bg-surface px-2 py-4 text-center active:scale-95 transition-transform"
             >
-              <span className={`flex h-11 w-11 items-center justify-center rounded-xl ${a.bg} text-white`}>
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent">
                 <a.icon size={20} />
               </span>
               <span className="text-sm font-semibold">{a.label}</span>
@@ -70,7 +70,7 @@ export default function LogMealSheet({ open, onClose }: { open: boolean; onClose
           onClick={onClose}
           className="card-shadow mt-3 flex items-center gap-3 rounded-2xl bg-surface px-4 py-3.5 active:scale-[0.98] transition-transform"
         >
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-600 text-white">
+          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent">
             <Barcode size={20} />
           </span>
           <div>
@@ -90,7 +90,7 @@ export default function LogMealSheet({ open, onClose }: { open: boolean; onClose
               onClick={onClose}
               className="card-shadow flex flex-col items-center gap-2 rounded-2xl bg-surface px-2 py-4 text-center active:scale-95 transition-transform"
             >
-              <span className={`flex h-11 w-11 items-center justify-center rounded-xl ${a.bg} text-white`}>
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-soft text-accent">
                 <a.icon size={20} />
               </span>
               <span className="text-sm font-semibold">{a.label}</span>

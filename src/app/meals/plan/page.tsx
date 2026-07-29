@@ -22,7 +22,7 @@ export default function MealPlanPage() {
           href="/meals/browse"
           className="card-shadow flex flex-col items-center gap-1.5 rounded-2xl bg-surface p-3 text-center"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-500 text-white">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
             <Compass size={16} />
           </span>
           <span className="text-xs font-semibold">Browse ideas</span>
@@ -31,7 +31,7 @@ export default function MealPlanPage() {
           href="/meals/recipes"
           className="card-shadow flex flex-col items-center gap-1.5 rounded-2xl bg-surface p-3 text-center"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-500 text-white">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
             <ChefHat size={16} />
           </span>
           <span className="text-xs font-semibold">Recipes</span>
@@ -40,7 +40,7 @@ export default function MealPlanPage() {
           href="/meals/shopping-list"
           className="card-shadow flex flex-col items-center gap-1.5 rounded-2xl bg-surface p-3 text-center"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
             <ShoppingBasket size={16} />
           </span>
           <span className="text-xs font-semibold">Shopping list</span>
